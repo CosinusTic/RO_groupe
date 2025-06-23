@@ -9,8 +9,10 @@ This is a repo for EPITA Operational Research (RO in french).
 - Julien Fleury
 
 ## Setup
-Init virtual envirnment with ```python -m venv venv```
-Launch virtual env with ```source ./venv/bin/activate```
+ ```
+ python -m venv venv # Setup virtual environment (venv)
+ source ./venv/bin/activate # Activate venv
+ ```
 
 Then, install dependencies with 
 ```
@@ -18,4 +20,6 @@ pip install -r pip install -r requirements.txt
 ```
 
 ## Run
-Run with ```python 3 drone.py```
+```
+python 3 drone.py # Run the project
+```
