@@ -32,4 +32,13 @@ ax.plot(lons, lats, color='red', linewidth=1.5, alpha=0.7)
 
 # Titre et affichage
 ax.set_title("Chemin eulérien approximatif sur Montréal", fontsize=12)
-plt.show()
+
+
+print("Generation strategy:\n1. Generate png (ideal for non-interactive environments)\n2. Display straight away\n")
+choice = input("Your choice: ")
+
+if choice == 1 or choice == '1':
+    plt.savefig("resources/eulerian_path_montreal.png", dpi=300)
+    print("Saved to resources/eulerian_path_montreal.png")
+else:
+    plt.show()
