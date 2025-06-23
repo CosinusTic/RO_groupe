@@ -21,5 +21,5 @@ pip install -r pip install -r requirements.txt
 
 ## Run
 ```
-python 3 drone.py # Run the project
+python3 drone.py # Run the project
 ```
