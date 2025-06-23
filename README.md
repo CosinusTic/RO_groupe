@@ -16,7 +16,7 @@ This is a repo for EPITA Operational Research (RO in french).
 
 Then, install dependencies with 
 ```
-pip install -r pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Run
