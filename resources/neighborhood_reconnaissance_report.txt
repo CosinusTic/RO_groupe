@@ -1,0 +1,62 @@
+MONTREAL NEIGHBORHOOD DRONE RECONNAISSANCE REPORT
+============================================================
+Generated: 2025-06-24 19:50:41
+
+SUMMARY:
+  • Total neighborhoods: 6
+  • Successful: 4
+  • Failed: 2
+
+TOTALS (Successful neighborhoods):
+  • Total distance: 0.00 km
+  • Total cost: 400.00 €
+  • Total processing time: 39.17 seconds
+
+DETAILED RESULTS:
+----------------------------------------
+
+Full Montreal:
+  ❌ FAILED
+  • Error: G is not Eulerian.
+  • Processing time: 18.96s
+
+Plateau-Mont-Royal:
+  ✅ SUCCESS
+  • Nodes: 658
+  • Edges: 1,110
+  • Odd nodes: 286
+  • Distance: 0.00 km
+  • Cost: 100.00 €
+  • Processing time: 7.64s
+
+Outremont:
+  ✅ SUCCESS
+  • Nodes: 241
+  • Edges: 370
+  • Odd nodes: 142
+  • Distance: 0.00 km
+  • Cost: 100.00 €
+  • Processing time: 4.23s
+
+Verdun:
+  ✅ SUCCESS
+  • Nodes: 305
+  • Edges: 505
+  • Odd nodes: 148
+  • Distance: 0.00 km
+  • Cost: 100.00 €
+  • Processing time: 6.65s
+
+Anjou:
+  ✅ SUCCESS
+  • Nodes: 741
+  • Edges: 1,146
+  • Odd nodes: 514
+  • Distance: 0.00 km
+  • Cost: 100.00 €
+  • Processing time: 20.65s
+
+Rivière-des-Prairies–Pointe-aux-Trembles:
+  ❌ FAILED
+  • Error: G is not Eulerian.
+  • Processing time: 4.39s
