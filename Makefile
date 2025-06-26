@@ -1,7 +1,3 @@
-
-recon: # Generate noded graph
-	python3 drone/drone.py
-
 recon_euler: # Generate eulerian graph
 	python3 drone/generate_eulerian_paths.py
 
