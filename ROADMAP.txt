@@ -30,3 +30,4 @@ you’ll find in, say, resources/neighborhoods/anjou/:
             - record full path
             - Record resource usage
         -> Outputs the cleared paths and the stats (costs, etc)
+        -> Graphical output overlay of the cleared paths: city eulerian graph + base snow + removed snow (don't add another layer of paint everytime, ask GPT to draw first the removed snow, then the snow,then eulerian otherwise the layers will add up into weird colors)
