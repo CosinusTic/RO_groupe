@@ -1,6 +1,9 @@
 ## Welcome
 This is a repo for EPITA Operational Research (RO in french).
 
+## Requirements
+```python-slugify``` (apt package)
+
 ## Authors
 - Norig Ciserani
 - Nathan Delmarche
