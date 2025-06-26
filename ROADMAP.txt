@@ -3,6 +3,7 @@ You have per neighborhood:
     eulerized_graph.pkl ← full road network (Eulerized)
     eulerian_path.json ← drone's flight path
     snow_map.csv ← simulated snow-covered edges
+    .png maps with and without snow
 
 
 Step 2: Vehicle:
