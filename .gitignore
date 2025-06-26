@@ -1,3 +1,4 @@
 ./cache
 ./venv
 ./resources/*
+vehicle/__pycache__/
