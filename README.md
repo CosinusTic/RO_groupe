@@ -18,8 +18,3 @@ Then, install dependencies with
 ```
 pip install -r requirements.txt
 ```
-
-## Run
-```
-python3 drone.py # Run the project
-```
