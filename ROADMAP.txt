@@ -7,11 +7,19 @@ You have per neighborhood:
 
 
 Step 2: Vehicle:
-Once the drone has identified roads requiring plowing, you will:
+    1: Design an agent (decision making):
+        -> Sees all neighbors (where can I go ?)
+        -> Decides direction (where should I go ? Did I see the road recently ? Is it snowy ?)
+        -> memory management (handling a heap of recent seen vehicles)
+        -> Contains parameters (greed ? Random ? Prioritize snow or unseen ? Memory size)
+        -> Different types (cheap vs fast vs smart) & measure tradeoffs (does more memory always help ?)
 
-    Extract the subgraph of those roads.
-
-    Possibly need new eulerization or Chinese Postman-like algorithms on those subgraphs.
-
-    Factor in vehicle constraints (one-way roads, plow efficiency, vehicle type costs, etc.)
-
+    2: Snow clearing simulation (running the experiment)
+        -> Initializes the graph and loads the map with settings (number of vehicles, fuel per vehicle, max load, memory size, etc)
+        -> Place a vehicle (or several ?) on a starting node, and start a loop:
+            - decide next move
+            - move position
+            - mark cleared
+            - record full path
+            - Record resource usage
+        -> Outputs the cleared paths and the stats (costs, etc)

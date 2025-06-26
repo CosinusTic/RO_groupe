@@ -16,3 +16,6 @@ render_unified: # Generate .png for all neighborhoods
 
 render_unified_snow: # Generate .png with snow for all neighborhoods
 	python3 drone/render_unified_with_snow.py
+
+simulate:
+	python3 vehicle/simulation.py
