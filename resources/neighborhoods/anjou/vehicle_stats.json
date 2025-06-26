@@ -1,8 +1,8 @@
 {
-  "steps_taken": 260,
-  "snow_cleared": 21,
-  "fuel_used": 65.0,
+  "steps_taken": 65,
+  "snow_cleared": 20,
+  "fuel_used": 16.25,
   "fuel_capacity": 1000,
-  "path_length": 261,
-  "ended_at": 596644340
+  "path_length": 66,
+  "ended_at": 596644284
 }

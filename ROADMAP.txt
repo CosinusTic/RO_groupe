@@ -14,6 +14,13 @@ Step 2: Vehicle:
         -> Contains parameters (greed ? Random ? Prioritize snow or unseen ? Memory size)
         -> Different types (cheap vs fast vs smart) & measure tradeoffs (does more memory always help ?)
 
+== The reports ==
+you’ll find in, say, resources/neighborhoods/anjou/:
+    vehicle_stats.json – raw JSON of fuel, steps, snow cleared, returns
+    vehicle_report.txt – the human-readable summary you asked for
+    vehicle_path.json – full detailed path log
+    vehicle_cleared.csv – list of cleared edges
+
     2: Snow clearing simulation (running the experiment)
         -> Initializes the graph and loads the map with settings (number of vehicles, fuel per vehicle, max load, memory size, etc)
         -> Place a vehicle (or several ?) on a starting node, and start a loop:
