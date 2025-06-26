@@ -5,6 +5,8 @@ import json
 import pickle
 import networkx as nx
 from brain import VehicleAgent
+from vehicles import VehicleTypeI, VehicleTypeII, SuperDrone
+
 
 def prompt_for_neighborhood():
     root_dir = "resources/neighborhoods"
@@ -51,7 +53,7 @@ def load_graph_with_snow(input_dir):
 def simulate():
     neighborhood = prompt_for_neighborhood()
     input_dir = os.path.join("resources/neighborhoods", neighborhood)
-    config_path = os.path.join(input_dir, "agent_config.json")
+    config_path = "vehicle/config.json"
 
     cleared_csv = os.path.join(input_dir, "vehicle_cleared.csv")
     path_json = os.path.join(input_dir, "vehicle_path.json")
@@ -59,7 +61,10 @@ def simulate():
 
     G = load_graph_with_snow(input_dir)
     start_node = list(G.nodes())[0]
-    agent = VehicleAgent(start_node, config_path)
+
+    AgentClass = prompt_for_agent_type()
+    agent = AgentClass(start_node, config_path)
+
     cleared_edges = set()
 
     while agent.can_continue():
@@ -94,6 +99,28 @@ def simulate():
     print(f"\n✅ Simulation completed for: {neighborhood}")
     print(f"🧹 Cleared snow on {agent.snow_cleared} edges in {agent.steps_taken} steps")
     print(f"⛽ Fuel used: {agent.fuel_used:.2f}/{agent.fuel_capacity}")
+    print(f"\n cost : {agent.compute_cost()}")
+    print(f"\n distance traveled : {agent.distance_traveled}")
+
+def prompt_for_agent_type():
+    print("\n🚗 Choose vehicle type:")
+    print("1. Vehicle Type I")
+    print("2. Vehicle Type II")
+    print("3. Super Drone")
+
+    while True:
+        try:
+            choice = int(input("Enter choice (1-3): "))
+            if choice == 1:
+                return VehicleTypeI
+            elif choice == 2:
+                return VehicleTypeII
+            elif choice == 3:
+                return SuperDrone
+        except ValueError:
+            pass
+        print("❌ Invalid input. Please enter 1, 2, or 3.")
+
 
 if __name__ == "__main__":
     simulate()

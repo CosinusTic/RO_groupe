@@ -2,140 +2,128 @@ import os
 import pickle
 import json
 import csv
-import networkx as nx
-import osmnx as ox
-import matplotlib.pyplot as plt
-from slugify import slugify
-from matplotlib.lines import Line2D
+import plotly.graph_objects as go
+from plotly.colors import qualitative, sample_colorscale
 
 NEIGHBORHOOD_DIR = "resources/neighborhoods"
-OUTPUT_DIR = "resources/graphical_output"
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+OUTPUT_PATH = "resources/unified/snow_overlay_map.html"
+os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 
-def apply_snow_from_csv(G: nx.Graph, csv_path: str) -> nx.Graph:
-    """Apply snow data from CSV to the graph by setting edge['snow'] = True"""
-    is_multigraph = G.is_multigraph()
+def render_plotly_mapbox_with_snow():
+    from collections import defaultdict
 
-    # Reset snow status
-    if is_multigraph:
-        for u, v, k in G.edges(keys=True):
-            G[u][v][k]['snow'] = False
-    else:
-        for u, v in G.edges():
-            G[u][v]['snow'] = False
+    secteur_paths = defaultdict(lambda: {"lat": [], "lon": []})
+    snow_segments = {"lat": [], "lon": []}
+    all_coords = set()
 
-    # Parse CSV and apply snow
-    with open(csv_path, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            try:
-                u, v, snow = int(row["u"]), int(row["v"]), int(row["snow"])
-                if snow == 1:
-                    if is_multigraph:
-                        if G.has_edge(u, v):
-                            for k in G[u][v]:
-                                G[u][v][k]['snow'] = True
-                        elif G.has_edge(v, u):
-                            for k in G[v][u]:
-                                G[v][u][k]['snow'] = True
-                    else:
-                        if G.has_edge(u, v):
-                            G[u][v]['snow'] = True
-                        elif G.has_edge(v, u):
-                            G[v][u]['snow'] = True
-            except Exception as e:
-                print(f"⚠️ Skipping malformed row in snow CSV: {row} ({e})")
-    return G
+    for name in sorted(os.listdir(NEIGHBORHOOD_DIR)):
+        path = os.path.join(NEIGHBORHOOD_DIR, name)
+        if not os.path.isdir(path):
+            continue
 
-def render_neighborhood_with_snow(neigh_path):
-    slug = os.path.basename(neigh_path)
-    print(f"🎨 Rendering {slug}...")
+        try:
+            # === Chargement du graphe ===
+            with open(os.path.join(path, "eulerized_graph.pkl"), "rb") as f:
+                G = pickle.load(f)
 
-    try:
-        # Load Eulerized graph
-        graph_path = os.path.join(neigh_path, "eulerized_graph.pkl")
-        with open(graph_path, "rb") as f:
-            G = pickle.load(f)
+            # === Chargement du chemin eulérien ===
+            with open(os.path.join(path, "eulerian_path.json")) as f:
+                path_data = json.load(f)
+            path_nodes = [edge["u"] for edge in path_data] + [path_data[-1]["v"]]
 
-        # Load Eulerian path
-        path_json = os.path.join(neigh_path, "eulerian_path.json")
-        with open(path_json) as f:
-            path = json.load(f)
-        path_nodes = [edge["u"] for edge in path] + [path[-1]["v"]]
+            coords = [(G.nodes[n]['y'], G.nodes[n]['x']) for n in path_nodes if n in G.nodes]
 
-        # Load and apply snow CSV
-        snow_path = os.path.join(neigh_path, "snow_map.csv")
-        if os.path.isfile(snow_path):
-            print(f"📄 Found snow map: {snow_path}")
-            with open(snow_path) as f:
-                print("📄 Sample snow_map.csv rows:", [next(f).strip() for _ in range(3)])
-            G = apply_snow_from_csv(G, snow_path)
-        else:
-            print(f"⚠️ No snow_map.csv found for {slug}, skipping snow.")
+            for i in range(len(coords) - 1):
+                lat1, lon1 = coords[i]
+                lat2, lon2 = coords[i + 1]
+                secteur_paths[name]["lat"].extend([lat1, lat2, None])
+                secteur_paths[name]["lon"].extend([lon1, lon2, None])
+                all_coords.update([(lat1, lon1), (lat2, lon2)])
 
-        # Plot base road network (light gray)
-        fig, ax = ox.plot_graph(
-            G,
-            show=False, close=False,
-            edge_color='lightgray',
-            edge_linewidth=0.5,
-            node_size=0,
-            bgcolor='white'
-        )
+            # === Chargement du snow_map.csv ===
+            snow_csv_path = os.path.join(path, "snow_map.csv")
+            if os.path.isfile(snow_csv_path):
+                with open(snow_csv_path, newline="") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        if row["snow"] == "1":
+                            u, v = int(row["u"]), int(row["v"])
+                            if u in G.nodes and v in G.nodes:
+                                lat1, lon1 = G.nodes[u]['y'], G.nodes[u]['x']
+                                lat2, lon2 = G.nodes[v]['y'], G.nodes[v]['x']
+                                snow_segments["lat"].extend([lat1, lat2, None])
+                                snow_segments["lon"].extend([lon1, lon2, None])
+                                all_coords.update([(lat1, lon1), (lat2, lon2)])
+            else:
+                print(f"⚠️ No snow map found for {name}")
 
-        # Plot snowy edges in blue (under drone path)
-        snowy_count = 0
-        if G.is_multigraph():
-            for u, v, k in G.edges(keys=True):
-                if G[u][v][k].get('snow', False):
-                    snowy_count += 1
-                    x = [G.nodes[u]['x'], G.nodes[v]['x']]
-                    y = [G.nodes[u]['y'], G.nodes[v]['y']]
-                    ax.plot(x, y, color='black', linewidth=4, alpha=0.8)
-        else:
-            for u, v in G.edges():
-                if G[u][v].get('snow', False):
-                    snowy_count += 1
-                    x = [G.nodes[u]['x'], G.nodes[v]['x']]
-                    y = [G.nodes[u]['y'], G.nodes[v]['y']]
-                    ax.plot(x, y, color='black', linewidth=4, alpha=0.8)
+        except Exception as e:
+            print(f"⚠️ Skipping {name} due to error: {e}")
 
-        print(f" {slug}: Rendered {snowy_count} snowy edges.")
+    if not all_coords:
+        print("❌ Aucun segment valide.")
+        return
 
-        # Plot drone path in red
-        valid_coords = [
-            (G.nodes[n]['y'], G.nodes[n]['x'])
-            for n in path_nodes
-            if n in G.nodes and 'x' in G.nodes[n] and 'y' in G.nodes[n]
-        ]
-        if valid_coords:
-            lats, lons = zip(*valid_coords)
-            ax.plot(lons, lats, color='red', linewidth=2.2, alpha=0.7)
+    lats, lons = zip(*all_coords)
+    avg_lat = sum(lats) / len(lats)
+    avg_lon = sum(lons) / len(lons)
 
-        # Add title and legend
-        ax.set_title(f"{slug.replace('-', ' ').title()}", fontsize=10)
+    fig = go.Figure()
 
-        legend_elements = [
-            Line2D([0], [0], color='lightgray', lw=2, label='All roads'),
-            Line2D([0], [0], color='black', lw=2, label='Snow-covered'),
-            Line2D([0], [0], color='red', lw=2, label='Drone path')
-        ]
-        ax.legend(handles=legend_elements, loc='lower right', fontsize='small')
+    # === Couleurs des secteurs ===
+    secteur_names = list(secteur_paths.keys())
+    # === Couleurs personnalisées à fort contraste (exclut les bleus)
+    custom_palette = [
+        "#EF553B", "#00CC96", "#AB63FA", "#FFA15A",
+        "#FF6692", "#B6E880", "#FF97FF", "#FECB52", "#636EFA"
+    ]
+    color_map = {
+        secteur: custom_palette[i % len(custom_palette)]
+        for i, secteur in enumerate(secteur_names)
+    }
 
-        # Save output
-        out_path = os.path.join(OUTPUT_DIR, f"{slug}.png")
-        plt.savefig(out_path, dpi=300)
-        plt.close()
-        print(f"✅ Saved to {out_path}")
+    # === Tracés des trajets drone ===
+    for secteur, data in secteur_paths.items():
+        fig.add_trace(go.Scattermapbox(
+            lat=data["lat"],
+            lon=data["lon"],
+            mode="lines",
+            line=dict(width=3, color=color_map[secteur]),
+            name=secteur,
+            hoverinfo="text",
+            text=[secteur] * len(data["lat"]),
+        ))
 
-    except Exception as e:
-        print(f"❌ Error rendering {slug}: {e}")
+    # === Tracé des segments enneigés en BLEU (après pour éviter qu'ils soient couverts) ===
+    if snow_segments["lat"]:
+        fig.add_trace(go.Scattermapbox(
+            lat=snow_segments["lat"],
+            lon=snow_segments["lon"],
+            mode="lines",
+            line=dict(width=4, color="blue"),
+            name="Segments enneigés",
+            hoverinfo="text",
+            text=["Enneigé"] * len(snow_segments["lat"]),
+        ))
+
+    # === Mise en forme finale ===
+    fig.update_layout(
+        mapbox=dict(
+            style="carto-positron",  # Fond clair
+            center={"lat": avg_lat, "lon": avg_lon},
+            zoom=11,
+            uirevision="zoom"
+        ),
+        margin={"r": 0, "t": 40, "l": 0, "b": 0},
+        title="🧊 Segments enneigés et trajets du drone – Montréal",
+        autosize=True,
+        hovermode="closest",
+        dragmode="pan"
+    )
+
+    fig.write_html(OUTPUT_PATH, include_plotlyjs="cdn", full_html=True)
+    print(f"✅ Carte finale générée : {OUTPUT_PATH}")
 
 if __name__ == "__main__":
-    for name in os.listdir(NEIGHBORHOOD_DIR):
-        path = os.path.join(NEIGHBORHOOD_DIR, name)
-        if os.path.isdir(path):
-            render_neighborhood_with_snow(path)
-
-    print("🎯 All neighborhood maps generated.")
+    render_plotly_mapbox_with_snow()
 

@@ -14,6 +14,8 @@ class VehicleAgent:
         self.snow_capacity = config["snow_capacity"]
         self.return_to_base = config.get("return_to_base", False)
 
+        self.distance_traveled = 0.0
+
         self.memory = []
         self.path = [start_node]
 
@@ -52,6 +54,7 @@ class VehicleAgent:
         self.current_node = next_node
         self.steps_taken += 1
         self.fuel_used += edge_length * self.fuel_per_meter
+        self.distance_traveled += edge_length
 
     def can_continue(self):
         if self.fuel_used >= self.fuel_capacity:
