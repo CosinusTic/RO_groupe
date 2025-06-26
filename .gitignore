@@ -1,4 +1,4 @@
-./cache
-./venv
-./resources/*
+cache
+venv
+resources/
 vehicle/__pycache__/

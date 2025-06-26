@@ -1,2 +1,0 @@
-Total path length: 95.34 km
-Total drone cost: 100.95 €
