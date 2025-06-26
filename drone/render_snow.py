@@ -6,6 +6,7 @@ import networkx as nx
 import osmnx as ox
 import matplotlib.pyplot as plt
 from slugify import slugify
+from matplotlib.lines import Line2D
 
 NEIGHBORHOOD_DIR = "resources/neighborhoods"
 OUTPUT_DIR = "resources/graphical_output"
@@ -72,7 +73,7 @@ def render_neighborhood_with_snow(neigh_path):
         else:
             print(f"⚠️ No snow_map.csv found for {slug}, skipping snow.")
 
-        # Plot base map
+        # Plot base road network (light gray)
         fig, ax = ox.plot_graph(
             G,
             show=False, close=False,
@@ -82,7 +83,7 @@ def render_neighborhood_with_snow(neigh_path):
             bgcolor='white'
         )
 
-        # Plot snowy edges in blue
+        # Plot snowy edges in blue (under drone path)
         snowy_count = 0
         if G.is_multigraph():
             for u, v, k in G.edges(keys=True):
@@ -90,16 +91,16 @@ def render_neighborhood_with_snow(neigh_path):
                     snowy_count += 1
                     x = [G.nodes[u]['x'], G.nodes[v]['x']]
                     y = [G.nodes[u]['y'], G.nodes[v]['y']]
-                    ax.plot(x, y, color='blue', linewidth=1.2, alpha=0.8)
+                    ax.plot(x, y, color='black', linewidth=4, alpha=0.8)
         else:
             for u, v in G.edges():
                 if G[u][v].get('snow', False):
                     snowy_count += 1
                     x = [G.nodes[u]['x'], G.nodes[v]['x']]
                     y = [G.nodes[u]['y'], G.nodes[v]['y']]
-                    ax.plot(x, y, color='blue', linewidth=1.2, alpha=0.8)
+                    ax.plot(x, y, color='black', linewidth=4, alpha=0.8)
 
-        print(f"🔵 {slug}: Rendered {snowy_count} snowy edges.")
+        print(f" {slug}: Rendered {snowy_count} snowy edges.")
 
         # Plot drone path in red
         valid_coords = [
@@ -109,9 +110,19 @@ def render_neighborhood_with_snow(neigh_path):
         ]
         if valid_coords:
             lats, lons = zip(*valid_coords)
-            ax.plot(lons, lats, color='red', linewidth=1.5, alpha=0.7)
+            ax.plot(lons, lats, color='red', linewidth=2.2, alpha=0.7)
 
+        # Add title and legend
         ax.set_title(f"{slug.replace('-', ' ').title()}", fontsize=10)
+
+        legend_elements = [
+            Line2D([0], [0], color='lightgray', lw=2, label='All roads'),
+            Line2D([0], [0], color='black', lw=2, label='Snow-covered'),
+            Line2D([0], [0], color='red', lw=2, label='Drone path')
+        ]
+        ax.legend(handles=legend_elements, loc='lower right', fontsize='small')
+
+        # Save output
         out_path = os.path.join(OUTPUT_DIR, f"{slug}.png")
         plt.savefig(out_path, dpi=300)
         plt.close()
