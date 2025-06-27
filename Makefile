@@ -6,11 +6,11 @@ snow: # Apply snow for all neighborhoods (generate .csv) => kiki
 	python3 drone/drone_generate_snow.py
 
 ## Step 2 ##
-drone_recon_oriented: # Generate eulerian graph (oriented) for the 5 neighborhoods => Nathan
-	python3 drone/generate_eulerian_paths.py
+vehicle_recon_oriented: # Generate eulerian graph (oriented) for the 5 neighborhoods => Nathan
+	python3 vehicle/generate_eulerian_paths_oriented.py
 
-render_unified: # Render HTML file from 5 neighborhoods from eulerized_graph (wait)
-	python3 drone/render_unified.py
+render_unified: # Render HTML file from 5 neighborhoods from eulerized oriented graph => Nathan
+	python3 vehicle/render_graph_oriented_unified.py
 
 render_unified_snow: # Render HTML file from 5 neighborhoods with snow overhead (wait)
 	python3 drone/render_unified_snow.py
