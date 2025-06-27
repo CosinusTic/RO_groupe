@@ -11,7 +11,7 @@ import plotly.graph_objects as go
 from plotly.colors import qualitative
 
 NEIGH_DIR   = "resources/neighborhoods"
-GLOBAL_SNOW = "resources/unified/snow_map.csv"
+GLOBAL_SNOW = "resources/neighborhoods/snow_map.csv"
 OUT_HTML    = "resources/unified/drone_oriented_with_snow.html"
 PALETTE     = qualitative.Dark24
 os.makedirs(os.path.dirname(OUT_HTML), exist_ok=True)
