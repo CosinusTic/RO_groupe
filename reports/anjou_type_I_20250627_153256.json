@@ -1,0 +1,19 @@
+{
+  "timestamp": "20250627_153256",
+  "neighborhood": "anjou",
+  "vehicle": "type_I",
+  "stats": {
+    "vehicle_type": "custom",
+    "steps_taken": 1227,
+    "snow_cleared": 196,
+    "fuel_used": 50057.33,
+    "fuel_capacity": 50000,
+    "distance_km": 200.229,
+    "time_h": 20.02,
+    "cost_total": 744.68,
+    "path_length": 1228,
+    "ended_at": 224911587,
+    "coverage_pct": 33.52,
+    "node_visit_pct": 31.31
+  }
+}
