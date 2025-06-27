@@ -1,17 +1,21 @@
-recon_euler: # Generate eulerian graph
+## Step 1 ##
+drone_recon: # Generate eulerian graph (non-oriented) for the whole city => kiki
 	python3 drone/generate_eulerian_paths.py
 
-snow: # Apply snow for all neighborhoods
+snow: # Apply snow for all neighborhoods (generate .csv) => kiki
 	python3 drone/drone_generate_snow.py
 
-render_snow: # Generate .png under each neighborhoods
-	python3 drone/render_snow.py
+## Step 2 ##
+drone_recon_oriented: # Generate eulerian graph (oriented) for the 5 neighborhoods => Nathan
+	python3 drone/generate_eulerian_paths.py
 
-render_unified: # Generate .png for all neighborhoods
+render_unified: # Render HTML file from 5 neighborhoods from eulerized_graph (wait)
 	python3 drone/render_unified.py
 
-render_unified_snow: # Generate .png with snow for all neighborhoods
-	python3 drone/render_unified_with_snow.py
+render_unified_snow: # Render HTML file from 5 neighborhoods with snow overhead (wait)
+	python3 drone/render_unified_snow.py
 
-simulate:
+simulate: # Launch sinulation (juju)
 	python3 vehicle/simulation.py
+
+report: # => Generate visual rendering from report => lolo (generate matplotlib reports to compare iterations, analyse one iteration over time, etc)

@@ -4,6 +4,7 @@ You have per neighborhood:
     eulerian_path.json ← drone's flight path
     snow_map.csv ← simulated snow-covered edges
     .png maps with and without snow
+    - parcourir toute la ville avec le drone et detecter les chemins enneiges
 
 
 Step 2: Vehicle:
@@ -31,3 +32,17 @@ you’ll find in, say, resources/neighborhoods/anjou/:
             - Record resource usage
         -> Outputs the cleared paths and the stats (costs, etc)
         -> Graphical output overlay of the cleared paths: city eulerian graph + base snow + removed snow (don't add another layer of paint everytime, ask GPT to draw first the removed snow, then the snow,then eulerian otherwise the layers will add up into weird colors)
+
+    SCENARIO:
+    - pas assez de vehicle ? Qu'est ce qu'on fait
+    - assez de deneigeuse: focus sur finir plus vite 
+    - sous chemins euleriens
+    - essence
+    - memoire ?
+
+=> Oral
+    - comment on a formalise le pb
+    - demo 
+    - les scenarios rencontres
+    - les pb rencontres
+    - explication des pb
