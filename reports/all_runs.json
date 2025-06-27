@@ -55,5 +55,22 @@
       "coverage_pct": 37.36,
       "node_visit_pct": 33.74
     }
+  },
+  {
+    "timestamp": "2025-06-27T20:42:09",
+    "neighborhood": "anjou",
+    "stats": {
+      "vehicles_used": 6,
+      "type_I_used": 4,
+      "type_II_used": 2,
+      "snow_cleared": 560,
+      "coverage_pct": 100.0,
+      "visited_nodes": 624,
+      "visit_pct": 84.21,
+      "distance_km": 128.11,
+      "time_h": 11.18,
+      "cost_total": 3760.1,
+      "strategy": "speed"
+    }
   }
 ]
