@@ -1,0 +1,59 @@
+[
+  {
+    "timestamp": "2025-06-27T15:42:32",
+    "neighborhood": "anjou",
+    "vehicle": "type_I",
+    "stats": {
+      "vehicle_type": "custom",
+      "steps_taken": 1465,
+      "snow_cleared": 356,
+      "fuel_used": 50005.28,
+      "fuel_capacity": 50000,
+      "distance_km": 200.021,
+      "time_h": 20.0,
+      "cost_total": 744.43,
+      "path_length": 1466,
+      "ended_at": 596688972,
+      "coverage_pct": 64.29,
+      "node_visit_pct": 61.27
+    }
+  },
+  {
+    "timestamp": "2025-06-27T15:42:47",
+    "neighborhood": "anjou",
+    "vehicle": "type_II",
+    "stats": {
+      "vehicle_type": "custom",
+      "steps_taken": 1387,
+      "snow_cleared": 312,
+      "fuel_used": 50033.81,
+      "fuel_capacity": 50000,
+      "distance_km": 200.135,
+      "time_h": 10.01,
+      "cost_total": 1073.59,
+      "path_length": 1388,
+      "ended_at": 596687308,
+      "coverage_pct": 54.4,
+      "node_visit_pct": 51.69
+    }
+  },
+  {
+    "timestamp": "2025-06-27T15:43:09",
+    "neighborhood": "anjou",
+    "vehicle": "type_II",
+    "stats": {
+      "vehicle_type": "custom",
+      "steps_taken": 1387,
+      "snow_cleared": 225,
+      "fuel_used": 50073.08,
+      "fuel_capacity": 50000,
+      "distance_km": 200.292,
+      "time_h": 10.01,
+      "cost_total": 1073.8,
+      "path_length": 1388,
+      "ended_at": 596644353,
+      "coverage_pct": 37.36,
+      "node_visit_pct": 33.74
+    }
+  }
+]
