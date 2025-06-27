@@ -9,6 +9,7 @@ kiwisolver==1.4.8
 matplotlib==3.10.3
 narwhals==1.44.0
 networkx==3.5
+noise==1.2.2
 numpy==2.3.1
 osmnx==2.0.4
 packaging==25.0

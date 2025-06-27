@@ -3,9 +3,9 @@ import pickle
 import csv
 from noise import snoise2
 import networkx as nx
-
-GRAPH_PATH = "resources/whole_city/eulerized_graph.pkl"
-SNOW_MAP_PATH = "resources/whole_city/snow_map.csv"
+GRAPH_PATH = "resources/neighborhoods/anjou/eulerized_graph.pkl"
+# GRAPH_PATH = "resources/whole_city/eulerized_graph.pkl"
+SNOW_MAP_PATH = "resources/unified/snow_map.csv"
 
 # Configuration
 FREQ = 0.01       # fréquence du bruit : plus petit = zones plus grandes
