@@ -2,3 +2,5 @@ cache
 venv
 resources/
 vehicle/__pycache__/
+./idea
+reports/all_runs.json
