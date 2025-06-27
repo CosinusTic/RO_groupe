@@ -3,26 +3,30 @@ import pickle
 import csv
 from noise import snoise2
 import networkx as nx
-GRAPH_PATH = "resources/neighborhoods/anjou/eulerized_graph.pkl"
-# GRAPH_PATH = "resources/whole_city/eulerized_graph.pkl"
-SNOW_MAP_PATH = "resources/unified/snow_map.csv"
+import random
+import time
 
-# Configuration
-FREQ = 0.01       # fréquence du bruit : plus petit = zones plus grandes
-THRESHOLD = 0.15  # seuil d’intensité du bruit pour dire "il neige"
-SEED = 42         # pour reproductibilité
+# Chemins spécifiques au quartier d'Anjou
+GRAPH_PATH = "resources/neighborhoods/anjou/eulerized_graph.pkl"
+SNOW_MAP_PATH = "resources/neighborhoods/snow_map.csv"
+
+# Configuration réaliste aléatoire
+FREQ = 0.75        # Zones de neige plus grandes
+THRESHOLD = 0.075    # Seuil : + haut = neige plus rare mais plus nette
+OCTAVES = 4         # Complexité du bruit
+BASE = random.randint(0, 10000)  # seed aléatoire pour chaque exécution
 
 def simulate_snow_city():
     if not os.path.isfile(GRAPH_PATH):
-        print(f"❌ Missing graph: {GRAPH_PATH}")
+        print(f"❌ Graphe introuvable : {GRAPH_PATH}")
         return
 
     with open(GRAPH_PATH, "rb") as f:
         G = pickle.load(f)
 
-    print(f"📡 Chargement du graphe global ({len(G.edges())} arêtes)...")
+    print(f"✔ Chargement du graphe ({len(G.edges())} arêtes)")
 
-    # Obtenir les bornes pour normalisation
+    # Extraire les coordonnées
     lats = [G.nodes[n]['y'] for n in G.nodes if 'y' in G.nodes[n]]
     lons = [G.nodes[n]['x'] for n in G.nodes if 'x' in G.nodes[n]]
     min_lat, max_lat = min(lats), max(lats)
@@ -32,22 +36,28 @@ def simulate_snow_city():
         return (val - min_val) / (max_val - min_val)
 
     snow_data = []
-
-    print("❄️ Calcul du bruit de neige pour chaque segment...")
+    print(f"🌨️ Simulation aléatoire des zones de neige (base={BASE})...")
 
     for u, v in G.edges():
         try:
             x1, y1 = G.nodes[u]['x'], G.nodes[u]['y']
             x2, y2 = G.nodes[v]['x'], G.nodes[v]['y']
+
+            # Calcul du point central (milieu de l’arête)
             mx = normalize((x1 + x2) / 2, min_lon, max_lon)
             my = normalize((y1 + y2) / 2, min_lat, max_lat)
-            intensity = snoise2(mx / FREQ, my / FREQ, octaves=3, base=SEED)
-            snow = int(intensity > THRESHOLD)
-            snow_data.append((u, v, snow))
-        except KeyError:
-            print(f"⚠️ Coordonnées manquantes pour arête ({u},{v}), ignorée.")
 
-    print(f"✅ {sum(s == 1 for _, _, s in snow_data)} segments enneigés sur {len(snow_data)}")
+            intensity = snoise2(mx / FREQ, my / FREQ, octaves=OCTAVES, base=BASE)
+            snow = int(intensity > THRESHOLD)
+
+            snow_data.append((u, v, snow))
+
+        except KeyError:
+            print(f"⚠️ Coordonnées manquantes pour arête ({u},{v}), ignorée")
+
+    total = len(snow_data)
+    covered = sum(1 for _, _, s in snow_data if s == 1)
+    print(f"🧊 {covered} segments enneigés sur {total} ({(covered/total)*100:.1f} %)")
 
     os.makedirs(os.path.dirname(SNOW_MAP_PATH), exist_ok=True)
     with open(SNOW_MAP_PATH, "w", newline="") as f:
@@ -55,7 +65,7 @@ def simulate_snow_city():
         writer.writerow(["u", "v", "snow"])
         writer.writerows(snow_data)
 
-    print(f"📦 Fichier enregistré : {SNOW_MAP_PATH}")
+    print(f"💾 Fichier exporté : {SNOW_MAP_PATH}")
 
 if __name__ == "__main__":
     simulate_snow_city()
