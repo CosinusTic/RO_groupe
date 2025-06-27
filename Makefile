@@ -15,8 +15,9 @@ vehicle_recon_oriented: # Generate eulerian graph (oriented) for the 5 neighborh
 render_unified: # Render HTML file from 5 neighborhoods from eulerized oriented graph => Nathan
 	python3 vehicle/render_graph_oriented_unified.py
 
-render_unified_snow: # Render HTML file from 5 neighborhoods with snow overhead (wait)
-	python3 drone/render_unified_snow.py
+render_unified_snow: # Render HTML file from 5 neighborhoods with snow overhead (Nathan)
+	python3 vehicle/render_oriented_with_snow.py
+
 
 simulate: # Launch sinulation (juju)
 	python3 vehicle/simulation.py
