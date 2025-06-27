@@ -60,7 +60,7 @@ def format_with_units(key, value):
     return f"{value:.2f} {unit}" if unit else f"{value:.2f}"
 
 def main():
-    json_file = '../../reports/all_runs.json'
+    json_file = 'reports/all_runs.json'
     data = load_data(json_file)
 
     averages = average_by_vehicle_type(data)

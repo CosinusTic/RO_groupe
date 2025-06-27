@@ -92,7 +92,7 @@ def plot_histogram(df):
     plt.show()
 
 def main():
-    json_file = '../all_runs.json'
+    json_file = 'reports/all_runs.json'
     data = load_data(json_file)
 
     averages = average_by_vehicle_type(data)
