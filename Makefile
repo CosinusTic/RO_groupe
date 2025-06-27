@@ -22,4 +22,8 @@ render_unified_snow: # Render HTML file from 5 neighborhoods with snow overhead 
 simulate: # Launch sinulation (juju)
 	python3 vehicle/simulation.py
 
-report: # => Generate visual rendering from report => lolo (generate matplotlib reports to compare iterations, analyse one iteration over time, etc)
+report_graph:
+	python3 reports/graphical_output/compares_types_graph.py
+
+report_table: 
+	python3 reports/graphical_output/compares_types_table.py
