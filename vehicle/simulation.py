@@ -1,127 +1,183 @@
-# simulate_vehicle.py
-import os
-import csv
-import json
-import pickle
+from __future__ import annotations
+import argparse, csv, datetime as _dt, json, os, pickle
+from pathlib import Path
+import math
+
 import networkx as nx
-from brain import VehicleAgent
 from vehicles import VehicleTypeI, VehicleTypeII, SuperDrone
 
+# ----------------------------------------------------------------- constantes
+ROOT   = "resources/neighborhoods"
+REPORT = Path("reports/all_runs.json"); REPORT.parent.mkdir(exist_ok=True)
+DENCSV = Path("reports/deneige.csv")     # arêtes dégagées (cumulatif)
+DENCSV.parent.mkdir(exist_ok=True)
 
-def prompt_for_neighborhood():
-    root_dir = "resources/neighborhoods"
-    neighborhoods = [n for n in os.listdir(root_dir)
-                     if os.path.isdir(os.path.join(root_dir, n))]
+VEH = {
+    "type_I":  VehicleTypeI,
+    "type_II": VehicleTypeII,
+    "drone":   SuperDrone,
+}
 
-    print("\n📍 Available neighborhoods:")
-    for idx, name in enumerate(neighborhoods):
-        print(f"{idx + 1}. {name}")
-
-    while True:
-        try:
-            choice = int(input("Choose a neighborhood (number): "))
-            if 1 <= choice <= len(neighborhoods):
-                return neighborhoods[choice - 1]
-        except ValueError:
-            pass
-        print("❌ Invalid input. Please enter a valid number.")
-
-def load_graph_with_snow(input_dir):
-    graph_path = os.path.join(input_dir, "eulerized_graph.pkl")
-    snow_path = os.path.join(input_dir, "snow_map.csv")
-
-    with open(graph_path, "rb") as f:
+# ----------------------------------------------------------------- utilitaires
+def load_graph(folder: str) -> nx.Graph:
+    with open(os.path.join(folder, "eulerized_graph.pkl"), "rb") as f:
         G = pickle.load(f)
-
-    for u, v, key in G.edges(keys=True):
-        G[u][v][key]['snow'] = False
-
-    with open(snow_path, newline='') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            u, v, snow = int(row['u']), int(row['v']), int(row['snow'])
-            if snow == 1:
-                if G.has_edge(u, v):
-                    for key in G[u][v]:
-                        G[u][v][key]['snow'] = True
-                elif G.has_edge(v, u):
-                    for key in G[v][u]:
-                        G[v][u][key]['snow'] = True
-
+    nx.set_node_attributes(G, False, "snow")
+    with open(os.path.join(folder, "snow_map.csv"), newline="") as f:
+        for r in csv.DictReader(f):
+            if int(r["snow"]) == 1:
+                for nid in (r["u"], r["v"]):
+                    if nid and G.has_node(int(nid)):
+                        G.nodes[int(nid)]["snow"] = True
     return G
 
-def simulate():
-    neighborhood = prompt_for_neighborhood()
-    input_dir = os.path.join("resources/neighborhoods", neighborhood)
-    config_path = "vehicle/config.json"
 
-    cleared_csv = os.path.join(input_dir, "vehicle_cleared.csv")
-    path_json = os.path.join(input_dir, "vehicle_path.json")
-    stats_json = os.path.join(input_dir, "vehicle_stats.json")
+def snowy_nodes(G):
+    return {n for n, d in G.nodes(data=True) if d.get("snow", False)}
 
-    G = load_graph_with_snow(input_dir)
-    start_node = list(G.nodes())[0]
 
-    AgentClass = prompt_for_agent_type()
-    agent = AgentClass(start_node, config_path)
-
-    cleared_edges = set()
-
-    while agent.can_continue():
-        next_node = agent.choose_next(G)
-        if not next_node:
-            break
-
-        u, v = agent.current_node, next_node
-        edge_data = G[u][v][0] if isinstance(G[u][v], dict) else G[u][v]
-        length = edge_data.get("length", 1.0)
-
-        if any(G[u][v][key].get("snow", False) for key in G[u][v]):
-            for key in G[u][v]:
-                if G[u][v][key].get("snow", False):
-                    cleared_edges.add((u, v))
-                    G[u][v][key]["snow"] = False
-                    agent.snow_cleared += 1
-
-        agent.move_to(next_node, length)
-
-    with open(cleared_csv, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(["u", "v"])
-        writer.writerows(cleared_edges)
-
-    with open(path_json, "w") as f:
-        json.dump(agent.path, f)
-
-    with open(stats_json, "w") as f:
-        json.dump(agent.log_stats(), f, indent=2)
-
-    print(f"\n✅ Simulation completed for: {neighborhood}")
-    print(f"🧹 Cleared snow on {agent.snow_cleared} edges in {agent.steps_taken} steps")
-    print(f"⛽ Fuel used: {agent.fuel_used:.2f}/{agent.fuel_capacity}")
-    print(f"\n cost : {agent.compute_cost()}")
-    print(f"\n distance traveled : {agent.distance_traveled}")
-
-def prompt_for_agent_type():
-    print("\n🚗 Choose vehicle type:")
-    print("1. Vehicle Type I")
-    print("2. Vehicle Type II")
-    print("3. Super Drone")
-
+def prompt(lst, msg):
+    for i, x in enumerate(lst, 1):
+        print(f"{i}. {x}")
     while True:
         try:
-            choice = int(input("Enter choice (1-3): "))
-            if choice == 1:
-                return VehicleTypeI
-            elif choice == 2:
-                return VehicleTypeII
-            elif choice == 3:
-                return SuperDrone
+            idx = int(input(msg)) - 1
         except ValueError:
-            pass
-        print("❌ Invalid input. Please enter 1, 2, or 3.")
+            idx = -1
+        if 0 <= idx < len(lst):
+            return lst[idx]
 
+def append_edge(neigh: str, u: int, v: int):
+    """Ajoute (quartier, u, v) dans reports/deneige.csv (cumulatif)."""
+    header_needed = not DENCSV.exists()
+    with DENCSV.open("a", newline="") as f:
+        w = csv.writer(f)
+        if header_needed:
+            w.writerow(["neighborhood", "u", "v"])
+        w.writerow([neigh, u, v])
 
+# ----------------------------------------------------------------- stratégie
+def pick_vehicle(n_veh: int, mode: str) -> str:
+    if mode == "single":                 # toujours un type I
+        return "type_I"
+    if mode == "eco":                    # I I I I II …
+        return "type_II" if n_veh % 5 == 4 else "type_I"
+    # mode == "speed"                    # II II I I …
+    return "type_II" if n_veh < 2 else "type_I"
+
+# ----------------------------------------------------------------- simulation
+def simulate(neigh: str, cfg: str | None):
+    folder = os.path.join(ROOT, neigh)
+    G      = load_graph(folder)
+    snowy  = snowy_nodes(G)
+    init_snow = set(snowy)
+
+    # ----------- choix de la stratégie ----------------------------------
+    print("\nChoisir la stratégie :")
+    print("1. Moins chère possible (un seul véhicule type I, boucle)")
+    print("2. Économie d’argent (flotte majoritairement type I)")
+    print("3. Rapidité d’intervention (démarrage en type II)")
+    while True:
+        sel = input("Choix (1-3) ? ").strip()
+        if sel in {"1", "2", "3"}:
+            mode = {"1": "single", "2": "eco", "3": "speed"}[sel]
+            break
+        print("Entrée invalide.")
+
+    cfg_file = cfg if cfg and os.path.exists(cfg) else None
+    start    = next(iter(G.nodes))
+
+    # ---------------- accumulateurs globaux -----------------------------
+    n_total = n_I = n_II = 0
+    dist_total = dur_total = cost_total = 0.0
+    cleared, visited = set(), set()
+
+    # ---------------- boucle flotte ------------------------------------
+    while snowy:
+        veh_key = pick_vehicle(n_total, mode)
+        VehCls  = VEH[veh_key]
+
+        # comptage des véhicules
+        if mode == "single":
+            if n_total == 0:                   # premier et seul enregistrement
+                n_total = n_I = 1
+        else:
+            n_total += 1
+            if veh_key == "type_I":  n_I  += 1
+            if veh_key == "type_II": n_II += 1
+
+        agent = VehCls(start, config_path=cfg_file)
+
+        if mode == "single":
+            agent.max_hours     = math.inf
+            agent.fuel_capacity = math.inf
+            agent.snow_capacity = math.inf
+            agent.max_steps     = math.inf
+
+        # ------------- tournée du camion --------------------------------
+        while agent.can_continue():
+            nxt = agent.choose_next(G, snowy)
+            if nxt is None:
+                break
+            prev = agent.current               # garder l’origine de l’arête
+            ed = G[prev][nxt]
+            length_m = (ed if isinstance(ed, dict) else next(iter(ed.values()))
+                        ).get("length", 1.0)
+            agent.move_to(nxt, length_m)
+            visited.add(nxt)
+
+            if G.nodes[nxt].get("snow", False):
+                G.nodes[nxt]["snow"] = False
+                snowy.discard(nxt)
+                cleared.add(nxt)
+                agent.snow_cleared += 1
+                append_edge(neigh, prev, nxt)  # -------- journal CSV ------
+
+        # ------------- agrégation ---------------------------------------
+        st = agent.log_stats()
+        dist_total += st["distance_km"]
+        dur_total  += st["time_h"]
+        cost_total += agent.compute_cost()
+
+        if mode == "single" and not snowy:
+            break
+
+    # ---------------- statistiques finales -----------------------------
+    stats = {
+        "vehicles_used": n_total,
+        "type_I_used":   n_I,
+        "type_II_used":  n_II,
+        "snow_cleared":  len(cleared),
+        "coverage_pct":  round(100*len(cleared)/len(init_snow),2) if init_snow else 0,
+        "visited_nodes": len(visited),
+        "visit_pct":     round(100*len(visited)/G.number_of_nodes(),2),
+        "distance_km":   round(dist_total,2),
+        "time_h":        round(dur_total,2),
+        "cost_total":    round(cost_total,2),
+        "strategy":      mode,
+    }
+
+    # ---------------- rapport cumulatif ---------------------------------
+    rec = {"timestamp": _dt.datetime.now().isoformat(timespec="seconds"),
+           "neighborhood": neigh, "stats": stats}
+    try:
+        data = json.loads(REPORT.read_text()) if REPORT.exists() else []
+    except json.JSONDecodeError:
+        data = []
+    data.append(rec); REPORT.write_text(json.dumps(data, indent=2))
+
+    # ---------------- console -------------------------------------------
+    print(
+        f"{neigh} | neige {stats['snow_cleared']} nœuds | cover {stats['coverage_pct']} % | "
+        f"visit {stats['visit_pct']} % ({stats['visited_nodes']} nœuds) | "
+        f"véh {n_total} (I:{n_I} / II:{n_II}) | dist {stats['distance_km']} km | "
+        f"durée {stats['time_h']} h | coût {stats['cost_total']} €"
+    )
+
+# ----------------------------------------------------------------- CLI
 if __name__ == "__main__":
-    simulate()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-c", "--config", default="vehicle/config.json",
+                    help="fichier JSON de configuration")
+    simulate(prompt(os.listdir(ROOT), "Quartier ? "), ap.parse_args().config)
 

@@ -1,75 +1,111 @@
-import random
-import json
+import json, heapq, networkx as nx
+from typing import Dict, Optional
+
 
 class VehicleAgent:
-    def __init__(self, start_node, config_path):
-        with open(config_path) as f:
-            config = json.load(f)
+    """Navigation : toujours vers le nœud enneigé le plus proche."""
 
-        self.current_node = start_node
-        self.start_node = start_node
-        self.memory_size = config["memory_size"]
-        self.fuel_capacity = config["fuel_capacity"]
-        self.fuel_per_meter = config["fuel_per_meter"]
-        self.snow_capacity = config["snow_capacity"]
-        self.return_to_base = config.get("return_to_base", False)
+    # ---------------------------------------------------------------- init
+    def __init__(self, start: int, config: Optional[str] = "config.json") -> None:
+        cfg: Dict[str, float] = {}
+        if config:
+            try:
+                with open(config, encoding="utf-8") as f:
+                    cfg = json.load(f)
+            except FileNotFoundError:
+                pass
+        p = (cfg.get("vehicle_types", {})
+                .get(cfg.get("selected_vehicle"), cfg)).copy()
+        p.update(cfg.get("overrides", {}))
 
-        self.distance_traveled = 0.0
+        # paramètres opérationnels
+        self.memory_size    = p.get("memory_size",    10)
+        self.fuel_capacity  = p.get("fuel_capacity",  5_000)
+        self.fuel_per_meter = p.get("fuel_per_meter", 0.25)
+        self.snow_capacity  = p.get("snow_capacity",  300)
+        self.speed_kmph     = p.get("speed_kmph",     15)
+        self.max_hours      = p.get("max_hours",      12)
+        self.max_steps      = p.get("max_steps",      4_000)
 
-        self.memory = []
-        self.path = [start_node]
+        # coût kilométrique (unique variable côté agent)
+        self.cost_km        = p.get("cost_km", 1.2)
 
-        # Stats
-        self.steps_taken = 0
-        self.snow_cleared = 0
-        self.fuel_used = 0.0
+        # état dynamique
+        self.current  = start
+        self.memory   = []
+        self.path     = [start]
 
-    def observe(self, G):
-        return list(G[self.current_node])
+        self.steps = self.snow_cleared = 0
+        self.fuel_used = self.dist_m = self.time_h = 0.0
 
-    def choose_next(self, G):
-        neighbors = self.observe(G)
-        random.shuffle(neighbors)
+    # ---------------------------------------------------------- décision
+    def _shortest_to_snow(self, G: nx.Graph, snowy: set[int]) -> Optional[int]:
+        if not snowy:
+            return None
+        d, _ = nx.single_source_dijkstra(
+            G, self.current, weight=lambda u, v, ed: ed.get("length", 1)
+        )
+        targets = [n for n in snowy if n in d]
+        if not targets:
+            return None
+        target = min(targets, key=d.get)
+        # reconstruction du premier pas
+        pred = {self.current: None}
+        pq, seen = [(0, self.current)], set()
+        while pq:
+            dist, u = heapq.heappop(pq)
+            if u in seen:
+                continue
+            seen.add(u)
+            if u == target:
+                break
+            for v, ed in G[u].items():
+                w = ed.get("length", 1)
+                if v not in pred:
+                    pred[v] = u
+                    heapq.heappush(pq, (dist + w, v))
+        nxt = target
+        while pred[nxt] != self.current:
+            nxt = pred[nxt]
+        return nxt
 
-        for neighbor in neighbors:
-            edge = (self.current_node, neighbor)
-            if G.has_edge(*edge) and G[self.current_node][neighbor].get("snow", False):
-                if edge not in self.memory and (neighbor, self.current_node) not in self.memory:
-                    return neighbor
+    def choose_next(self, G: nx.Graph, snowy: set[int]) -> Optional[int]:
+        for n in sorted(G[self.current]):
+            if G.nodes[n].get("snow", False):
+                return n
+        return self._shortest_to_snow(G, snowy)
 
-        for neighbor in neighbors:
-            edge = (self.current_node, neighbor)
-            if edge not in self.memory:
-                return neighbor
-
-        return neighbors[0] if neighbors else None
-
-    def move_to(self, next_node, edge_length):
-        edge = (self.current_node, next_node)
-        self.memory.append(edge)
+    # ---------------------------------------------------------- mouvement
+    def move_to(self, nxt: int, length_m: float):
+        self.memory.append((self.current, nxt))
         if len(self.memory) > self.memory_size:
             self.memory.pop(0)
+        self.current = nxt
+        self.path.append(nxt)
 
-        self.path.append(next_node)
-        self.current_node = next_node
-        self.steps_taken += 1
-        self.fuel_used += edge_length * self.fuel_per_meter
-        self.distance_traveled += edge_length
+        self.steps      += 1
+        self.fuel_used  += length_m * self.fuel_per_meter
+        self.dist_m     += length_m
+        self.time_h     += (length_m / 1_000) / self.speed_kmph
 
-    def can_continue(self):
-        if self.fuel_used >= self.fuel_capacity:
-            return False
-        if self.snow_cleared >= self.snow_capacity:
-            return False
-        return True
+    # ---------------------------------------------------------- arrêt
+    def can_continue(self) -> bool:
+        return (self.steps        < self.max_steps     and
+                self.fuel_used    < self.fuel_capacity and
+                self.snow_cleared < self.snow_capacity and
+                self.time_h       < self.max_hours)
 
-    def log_stats(self):
+    # ---------------------------------------------------------- métriques
+    @property
+    def distance_km(self) -> float:        # utilisé par simulation.py
+        return self.dist_m / 1_000
+
+    # ---------------------------------------------------------- log
+    def log_stats(self) -> Dict[str, float]:
         return {
-            "steps_taken": self.steps_taken,
+            "steps":        self.steps,
             "snow_cleared": self.snow_cleared,
-            "fuel_used": round(self.fuel_used, 2),
-            "fuel_capacity": self.fuel_capacity,
-            "path_length": len(self.path),
-            "ended_at": self.current_node
+            "distance_km":  round(self.distance_km, 2),
+            "time_h":       round(self.time_h, 2),
+            "fuel_used":    round(self.fuel_used, 2),
         }
-
