@@ -5,6 +5,9 @@ drone_recon: # Generate eulerian graph (non-oriented) for the whole city => kiki
 snow: # Apply snow for all neighborhoods (generate .csv) => kiki
 	python3 drone/drone_generate_snow.py
 
+compare: # Compare oriented and non-oriented graphs 
+	python3 drone/check_integrity.py
+
 ## Step 2 ##
 vehicle_recon_oriented: # Generate eulerian graph (oriented) for the 5 neighborhoods => Nathan
 	python3 vehicle/generate_eulerian_paths_oriented.py

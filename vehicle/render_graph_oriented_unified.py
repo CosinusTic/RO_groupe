@@ -94,4 +94,3 @@ def render_plotly_mapbox_oriented():
 
 if __name__ == "__main__":
     render_plotly_mapbox_oriented()
-
