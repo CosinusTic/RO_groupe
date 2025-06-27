@@ -72,5 +72,90 @@
       "cost_total": 3760.1,
       "strategy": "speed"
     }
+  },
+  {
+    "timestamp": "2025-06-27T21:17:25",
+    "neighborhood": "anjou",
+    "stats": {
+      "vehicles_used": 1,
+      "type_I_used": 1,
+      "type_II_used": 0,
+      "snow_cleared": 560,
+      "coverage_pct": 100.0,
+      "visited_nodes": 621,
+      "visit_pct": 83.81,
+      "distance_km": 131.89,
+      "time_h": 13.19,
+      "cost_total": 660.62,
+      "strategy": "single"
+    }
+  },
+  {
+    "timestamp": "2025-06-27T21:17:55",
+    "neighborhood": "anjou",
+    "stats": {
+      "vehicles_used": 6,
+      "type_I_used": 4,
+      "type_II_used": 2,
+      "snow_cleared": 560,
+      "coverage_pct": 100.0,
+      "visited_nodes": 624,
+      "visit_pct": 84.21,
+      "distance_km": 128.11,
+      "time_h": 11.18,
+      "cost_total": 3760.1,
+      "strategy": "speed"
+    }
+  },
+  {
+    "timestamp": "2025-06-27T21:18:21",
+    "neighborhood": "anjou",
+    "stats": {
+      "vehicles_used": 7,
+      "type_I_used": 6,
+      "type_II_used": 1,
+      "snow_cleared": 560,
+      "coverage_pct": 100.0,
+      "visited_nodes": 625,
+      "visit_pct": 84.35,
+      "distance_km": 141.68,
+      "time_h": 13.36,
+      "cost_total": 3973.93,
+      "strategy": "eco"
+    }
+  },
+  {
+    "timestamp": "2025-06-27T21:19:00",
+    "neighborhood": "anjou",
+    "stats": {
+      "vehicles_used": 7,
+      "type_I_used": 6,
+      "type_II_used": 1,
+      "snow_cleared": 560,
+      "coverage_pct": 100.0,
+      "visited_nodes": 625,
+      "visit_pct": 84.35,
+      "distance_km": 141.68,
+      "time_h": 13.36,
+      "cost_total": 3973.93,
+      "strategy": "eco"
+    }
+  },
+  {
+    "timestamp": "2025-06-27T21:20:26",
+    "neighborhood": "anjou",
+    "stats": {
+      "vehicles_used": 1,
+      "type_I_used": 1,
+      "type_II_used": 0,
+      "snow_cleared": 560,
+      "coverage_pct": 100.0,
+      "visited_nodes": 621,
+      "visit_pct": 83.81,
+      "distance_km": 131.89,
+      "time_h": 13.19,
+      "cost_total": 660.62,
+      "strategy": "single"
+    }
   }
 ]

@@ -131,7 +131,7 @@ def simulate(neigh: str, cfg: str | None):
                 snowy.discard(nxt)
                 cleared.add(nxt)
                 agent.snow_cleared += 1
-                append_edge(neigh, prev, nxt)  # -------- journal CSV ------
+                # append_edge(neigh, prev, nxt)  # -------- journal CSV ------
 
         # ------------- agrégation ---------------------------------------
         st = agent.log_stats()
