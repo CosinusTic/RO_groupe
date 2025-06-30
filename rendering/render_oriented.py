@@ -9,8 +9,8 @@ import json
 import plotly.graph_objects as go
 from plotly.colors import qualitative
 
-NEIGHBORHOOD_DIR = "resources/neighborhoods"
-OUTPUT_PATH      = "resources/unified/drone_oriented_plotly_map.html"
+NEIGHBORHOOD_DIR = "resources"
+OUTPUT_PATH      = "resources/oriented.html"
 os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 
 def render_plotly_mapbox_oriented():

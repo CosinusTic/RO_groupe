@@ -1,7 +1,7 @@
 import os, pickle, networkx as nx, pandas as pd
 rows=[]
-for slug in os.listdir("resources/neighborhoods"):
-    ndir=f"resources/neighborhoods/"+slug
+for slug in os.listdir("resources/"):
+    ndir=f"resources/"+slug
     try:
         G_un=pickle.load(open(ndir+"/eulerized_graph.pkl","rb"))
         G_or=pickle.load(open(ndir+"/eulerized_graph_oriented.pkl","rb"))
