@@ -1,5 +1,5 @@
 {
-  "memory_size": 50,
+  "memory_size": 0,
   "fuel_capacity":  5000,
   "fuel_per_meter": 0.25,
   "max_steps": 4000,
