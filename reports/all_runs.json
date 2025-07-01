@@ -78,5 +78,15 @@
     "cost_total": 5107.18,
     "strategy": "time",
     "neighborhood": "plateau-mont-royal"
+  },
+  {
+    "vehicles_used": 1,
+    "snow_cleared": 501,
+    "visited_nodes": 561,
+    "distance_km": 1062.0,
+    "time_h": 106.2,
+    "cost_total": 1804.66,
+    "strategy": "eco",
+    "neighborhood": "anjou"
   }
 ]

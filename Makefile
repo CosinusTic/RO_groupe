@@ -2,6 +2,9 @@
 drone_recon: # Generate eulerian graph (non-oriented) for the whole city => kiki
 	python3 drone/generate_eulerian_paths.py
 
+drone_traversal: # Estimate costs for drone traversal of borough graph
+	python3 drone/drone_traversal.py
+
 snow: # Apply snow for all neighborhoods (generate .csv) => kiki
 	python3 drone/drone_generate_snow.py
 
