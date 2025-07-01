@@ -157,5 +157,25 @@
       "cost_total": 660.62,
       "strategy": "single"
     }
+  },
+  {
+    "vehicles_used": 1,
+    "snow_cleared": 500,
+    "visited_nodes": 904,
+    "distance_km": 1790.0,
+    "time_h": 179.0,
+    "cost_total": 2700.1,
+    "strategy": "eco",
+    "neighborhood": "riviere-des-prairies-pointe-aux-trembles"
+  },
+  {
+    "vehicles_used": 1,
+    "snow_cleared": 500,
+    "visited_nodes": 904,
+    "distance_km": 1790.0,
+    "time_h": 179.0,
+    "cost_total": 2700.1,
+    "strategy": "eco",
+    "neighborhood": "riviere-des-prairies-pointe-aux-trembles"
   }
 ]

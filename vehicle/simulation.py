@@ -351,6 +351,37 @@ def simulate():
         print(f"      - Temps: {vehicle_time:.2f} heures")
         print(f"      - Neige nettoyée: {agent.snow_cleared} arêtes")
 
+    # -----------------------------------------------------------------
+    # 🔄  AJOUT D’UN RÉSUMÉ DANS runs_summary.json
+    # -----------------------------------------------------------------
+    summary_obj = {
+        "vehicles_used": len(all_agents),
+        "snow_cleared": total_snow_cleared,
+        "visited_nodes": len({n for p in all_paths.values() for n in p}),
+        "distance_km": round(total_distance, 2),
+        "time_h": round(max_time, 2),
+        "cost_total": round(total_cost, 2),
+        "strategy": "eco" if strategy == "economie_argent" else "time",
+        "neighborhood": neighborhood
+    }
+
+    summary_file = "reports/all_runs.json"
+    try:
+        with open(summary_file, "r") as f:
+            runs = json.load(f)
+            if not isinstance(runs, list):
+                raise ValueError
+    except (FileNotFoundError, json.JSONDecodeError, ValueError):
+        runs = []
+
+    runs.append(summary_obj)
+
+    with open(summary_file, "w") as f:
+        json.dump(runs, f, indent=2)
+
+    print(f"\n📝 Résumé ajouté dans {summary_file}")
+
+
 
 if __name__ == "__main__":
     simulate()
