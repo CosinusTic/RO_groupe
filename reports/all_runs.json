@@ -1,181 +1,82 @@
 [
   {
-    "timestamp": "2025-06-27T15:42:32",
-    "neighborhood": "anjou",
-    "vehicle": "type_I",
-    "stats": {
-      "vehicle_type": "custom",
-      "steps_taken": 1465,
-      "snow_cleared": 356,
-      "fuel_used": 50005.28,
-      "fuel_capacity": 50000,
-      "distance_km": 200.021,
-      "time_h": 20.0,
-      "cost_total": 744.43,
-      "path_length": 1466,
-      "ended_at": 596688972,
-      "coverage_pct": 64.29,
-      "node_visit_pct": 61.27
-    }
+    "vehicles_used": 1,
+    "snow_cleared": 500,
+    "visited_nodes": 655,
+    "distance_km": 1272.0,
+    "time_h": 127.2,
+    "cost_total": 2062.96,
+    "strategy": "eco",
+    "neighborhood": "plateau-mont-royal"
   },
   {
-    "timestamp": "2025-06-27T15:42:47",
-    "neighborhood": "anjou",
-    "vehicle": "type_II",
-    "stats": {
-      "vehicle_type": "custom",
-      "steps_taken": 1387,
-      "snow_cleared": 312,
-      "fuel_used": 50033.81,
-      "fuel_capacity": 50000,
-      "distance_km": 200.135,
-      "time_h": 10.01,
-      "cost_total": 1073.59,
-      "path_length": 1388,
-      "ended_at": 596687308,
-      "coverage_pct": 54.4,
-      "node_visit_pct": 51.69
-    }
-  },
-  {
-    "timestamp": "2025-06-27T15:43:09",
-    "neighborhood": "anjou",
-    "vehicle": "type_II",
-    "stats": {
-      "vehicle_type": "custom",
-      "steps_taken": 1387,
-      "snow_cleared": 225,
-      "fuel_used": 50073.08,
-      "fuel_capacity": 50000,
-      "distance_km": 200.292,
-      "time_h": 10.01,
-      "cost_total": 1073.8,
-      "path_length": 1388,
-      "ended_at": 596644353,
-      "coverage_pct": 37.36,
-      "node_visit_pct": 33.74
-    }
-  },
-  {
-    "timestamp": "2025-06-27T20:42:09",
-    "neighborhood": "anjou",
-    "stats": {
-      "vehicles_used": 6,
-      "type_I_used": 4,
-      "type_II_used": 2,
-      "snow_cleared": 560,
-      "coverage_pct": 100.0,
-      "visited_nodes": 624,
-      "visit_pct": 84.21,
-      "distance_km": 128.11,
-      "time_h": 11.18,
-      "cost_total": 3760.1,
-      "strategy": "speed"
-    }
-  },
-  {
-    "timestamp": "2025-06-27T21:17:25",
-    "neighborhood": "anjou",
-    "stats": {
-      "vehicles_used": 1,
-      "type_I_used": 1,
-      "type_II_used": 0,
-      "snow_cleared": 560,
-      "coverage_pct": 100.0,
-      "visited_nodes": 621,
-      "visit_pct": 83.81,
-      "distance_km": 131.89,
-      "time_h": 13.19,
-      "cost_total": 660.62,
-      "strategy": "single"
-    }
-  },
-  {
-    "timestamp": "2025-06-27T21:17:55",
-    "neighborhood": "anjou",
-    "stats": {
-      "vehicles_used": 6,
-      "type_I_used": 4,
-      "type_II_used": 2,
-      "snow_cleared": 560,
-      "coverage_pct": 100.0,
-      "visited_nodes": 624,
-      "visit_pct": 84.21,
-      "distance_km": 128.11,
-      "time_h": 11.18,
-      "cost_total": 3760.1,
-      "strategy": "speed"
-    }
-  },
-  {
-    "timestamp": "2025-06-27T21:18:21",
-    "neighborhood": "anjou",
-    "stats": {
-      "vehicles_used": 7,
-      "type_I_used": 6,
-      "type_II_used": 1,
-      "snow_cleared": 560,
-      "coverage_pct": 100.0,
-      "visited_nodes": 625,
-      "visit_pct": 84.35,
-      "distance_km": 141.68,
-      "time_h": 13.36,
-      "cost_total": 3973.93,
-      "strategy": "eco"
-    }
-  },
-  {
-    "timestamp": "2025-06-27T21:19:00",
-    "neighborhood": "anjou",
-    "stats": {
-      "vehicles_used": 7,
-      "type_I_used": 6,
-      "type_II_used": 1,
-      "snow_cleared": 560,
-      "coverage_pct": 100.0,
-      "visited_nodes": 625,
-      "visit_pct": 84.35,
-      "distance_km": 141.68,
-      "time_h": 13.36,
-      "cost_total": 3973.93,
-      "strategy": "eco"
-    }
-  },
-  {
-    "timestamp": "2025-06-27T21:20:26",
-    "neighborhood": "anjou",
-    "stats": {
-      "vehicles_used": 1,
-      "type_I_used": 1,
-      "type_II_used": 0,
-      "snow_cleared": 560,
-      "coverage_pct": 100.0,
-      "visited_nodes": 621,
-      "visit_pct": 83.81,
-      "distance_km": 131.89,
-      "time_h": 13.19,
-      "cost_total": 660.62,
-      "strategy": "single"
-    }
+    "vehicles_used": 2,
+    "snow_cleared": 508,
+    "visited_nodes": 655,
+    "distance_km": 2553.0,
+    "time_h": 64.05,
+    "cost_total": 5107.18,
+    "strategy": "time",
+    "neighborhood": "plateau-mont-royal"
   },
   {
     "vehicles_used": 1,
     "snow_cleared": 500,
-    "visited_nodes": 904,
-    "distance_km": 1790.0,
-    "time_h": 179.0,
-    "cost_total": 2700.1,
+    "visited_nodes": 655,
+    "distance_km": 1272.0,
+    "time_h": 127.2,
+    "cost_total": 2062.96,
     "strategy": "eco",
-    "neighborhood": "riviere-des-prairies-pointe-aux-trembles"
+    "neighborhood": "plateau-mont-royal"
   },
   {
     "vehicles_used": 1,
     "snow_cleared": 500,
-    "visited_nodes": 904,
-    "distance_km": 1790.0,
-    "time_h": 179.0,
-    "cost_total": 2700.1,
+    "visited_nodes": 655,
+    "distance_km": 1272.0,
+    "time_h": 127.2,
+    "cost_total": 2062.96,
     "strategy": "eco",
-    "neighborhood": "riviere-des-prairies-pointe-aux-trembles"
+    "neighborhood": "plateau-mont-royal"
+  },
+  {
+    "vehicles_used": 2,
+    "snow_cleared": 508,
+    "visited_nodes": 655,
+    "distance_km": 2553.0,
+    "time_h": 64.05,
+    "cost_total": 5107.18,
+    "strategy": "time",
+    "neighborhood": "plateau-mont-royal"
+  },
+  {
+    "vehicles_used": 2,
+    "snow_cleared": 508,
+    "visited_nodes": 655,
+    "distance_km": 2553.0,
+    "time_h": 64.05,
+    "cost_total": 5107.18,
+    "strategy": "time",
+    "neighborhood": "plateau-mont-royal"
+  },
+  {
+    "vehicles_used": 1,
+    "snow_cleared": 500,
+    "visited_nodes": 655,
+    "distance_km": 1272.0,
+    "time_h": 127.2,
+    "cost_total": 2062.96,
+    "strategy": "eco",
+    "neighborhood": "plateau-mont-royal"
+  },
+  {
+    "vehicles_used": 2,
+    "snow_cleared": 508,
+    "visited_nodes": 655,
+    "distance_km": 2553.0,
+    "time_h": 64.05,
+    "cost_total": 5107.18,
+    "strategy": "time",
+    "neighborhood": "plateau-mont-royal"
   }
 ]

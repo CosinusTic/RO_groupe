@@ -8,67 +8,67 @@ import pandas as pd
 REFERENCE_SNOW_CLEARED = 500
 
 UNITS = {
-    'steps_taken': 'steps',
-    'fuel_used': 'cl',
+    'vehicles_used': '',
+    'snow_cleared': 'units',
+    'visited_nodes': 'nodes',
     'distance_km': 'km',
     'time_h': 'min',
     'cost_total': '€'
 }
 
-EXCLUDED_KEYS = {'fuel_capacity', 'vehicle_type', 'path_length', 'ended_at', 'coverage_pct', 'node_visit_pct','snow_cleared'}
+EXCLUDED_KEYS = {'snow_cleared'}
 
 def load_data(filename):
     with open(filename, 'r') as f:
         return json.load(f)
 
-def average_by_vehicle_type(data):
+def average_by_strategy(data):
     grouped = defaultdict(list)
     for entry in data:
-        vehicle_type = entry['vehicle']
-        grouped[vehicle_type].append(entry['stats'])
+        strategy = entry['strategy']
+        grouped[strategy].append(entry)
 
     averages = {}
-    for vehicle_type, stats_list in grouped.items():
-        averages[vehicle_type] = {}
-        keys = stats_list[0].keys()
+    for strategy, entries in grouped.items():
+        averages[strategy] = {}
+        keys = entries[0].keys()
         for key in keys:
-            if isinstance(stats_list[0][key], (int, float)):
-                values = [s[key] for s in stats_list]
-                averages[vehicle_type][key] = mean(values)
+            if key in EXCLUDED_KEYS or not isinstance(entries[0][key], (int, float)):
+                continue
+            values = [e[key] for e in entries]
+            averages[strategy][key] = mean(values)
+        averages[strategy]['snow_cleared'] = mean([e['snow_cleared'] for e in entries])
     return averages
 
 def normalize_by_snow(averages, reference):
     normalized = {}
-    for vehicle_type, stats in averages.items():
-        if 'fuel_used' in stats and stats['fuel_used'] > 50000:
-            stats['fuel_used'] -= 50000
-
-        if 'fuel_used' in stats:
-            stats['fuel_used'] *= 100
-
-        if 'time_h' in stats:
-            stats['time_h'] *= 60
-
+    for strategy, stats in averages.items():
         factor = reference / stats['snow_cleared'] if stats['snow_cleared'] != 0 else 0
-        normalized[vehicle_type] = {
-            key: (val * factor if key != 'snow_cleared' else reference)
-            for key, val in stats.items()
-            if isinstance(val, (int, float))
-        }
-    return normalized
 
+        normalized_stats = {}
+        for key, val in stats.items():
+            if key == 'snow_cleared':
+                normalized_stats[key] = reference
+            elif key == 'time_h':
+                normalized_stats[key] = val * 60 * factor
+            else:
+                normalized_stats[key] = val * factor
+
+        normalized[strategy] = normalized_stats
+    return normalized
 
 def create_dataframe_for_plot(normalized):
     rows = []
-    for vehicle_type, stats in normalized.items():
+    for strategy, stats in normalized.items():
         for key, val in stats.items():
-            if key not in EXCLUDED_KEYS:
-                label = f"{key} ({UNITS.get(key, '')})"
-                rows.append({
-                    "Metric": label,
-                    "Vehicle Type": vehicle_type,
-                    "Value": val
-                })
+            if key in EXCLUDED_KEYS:
+                continue
+            label = f"{key} ({UNITS.get(key, '')})".strip()
+            rows.append({
+                "Metric": label,
+                "Strategy": strategy,
+                "Value": val
+            })
     return pd.DataFrame(rows)
 
 def plot_histogram(df):
@@ -79,23 +79,23 @@ def plot_histogram(df):
         data=df,
         x="Metric",
         y="Value",
-        hue="Vehicle Type",
+        hue="Strategy",
         palette="Set2"
     )
 
-    ax.set_title("Normalized Vehicle Metrics (Snow Cleared = 500 edge)", fontsize=14)
+    ax.set_title("Normalized Metrics by Strategy (Snow Cleared = 500 units)", fontsize=14)
     ax.set_ylabel("Normalized Value")
     ax.set_xlabel("Metric")
     plt.xticks(rotation=30, ha="right")
     plt.tight_layout()
-    plt.legend(title="Vehicle Type")
+    plt.legend(title="Strategy")
     plt.show()
 
 def main():
     json_file = 'reports/all_runs.json'
     data = load_data(json_file)
 
-    averages = average_by_vehicle_type(data)
+    averages = average_by_strategy(data)
     normalized = normalize_by_snow(averages, REFERENCE_SNOW_CLEARED)
 
     df = create_dataframe_for_plot(normalized)
