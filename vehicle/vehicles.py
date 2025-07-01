@@ -36,5 +36,3 @@ class VehicleTypeII(VehicleAgent):
         else:
             hourly_cost = self.hour_cost_first_8 * 8 + self.hour_cost_after_8 * (hours - 8)
         return round(self.fixed_cost + self.km_cost * distance_km + hourly_cost, 2)
-
-

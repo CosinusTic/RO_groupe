@@ -1,7 +1,7 @@
 {
-  "memory_size": 0,
-  "fuel_capacity":  5000,
-  "fuel_per_meter": 0.25,
+  "memory_size": 5,
+  "fuel_capacity":  10000,
+  "fuel_per_meter": 0.50,
   "max_steps": 4000,
   "snow_capacity":  500,
   "hour_breakpoint": 8,

@@ -27,7 +27,7 @@ def prompt_for_neighborhood():
         print("❌ Invalid input. Please enter a valid number.")
 
 def load_graph_with_snow(input_dir):
-    graph_path = os.path.join(input_dir, "eulerized_graph_oriented.pkl")
+    graph_path = os.path.join(input_dir, "eulerized_graph.pkl")
     snow_path = os.path.join(input_dir, "snow_map.csv")
 
     with open(graph_path, "rb") as f:
@@ -57,6 +57,13 @@ def estimate_total_snow_edges(G):
         if G[u][v][key].get('snow', False):
             snow_edges += 1
     return snow_edges
+
+def has_snow_remaining(G):
+    """Vérifie s'il reste de la neige dans le graphe"""
+    for u, v, key in G.edges(keys=True):
+        if G[u][v][key].get('snow', False):
+            return True
+    return False
 
 def calculate_vehicle_distribution(strategy, budget=None, total_snow_edges=0):
     """Calcule la distribution optimale des véhicules selon la stratégie"""
@@ -147,6 +154,11 @@ def simulate_vehicle(vehicle_class, start_node, config_path, G_shared, vehicle_i
     cleared_edges = set()
 
     while agent.can_continue():
+        # Vérifier s'il reste de la neige dans le graphe
+        if not has_snow_remaining(G_shared):
+            print(f"      ❄️ Plus de neige détectée - Arrêt du véhicule {vehicle_id}")
+            break
+
         next_node = agent.choose_next(G_shared)
         if not next_node:
             break
@@ -208,6 +220,10 @@ def simulate():
 
     # Simuler les véhicules Type I
     for i in range(num_type1):
+        if not has_snow_remaining(G):
+            print(f"   ❄️ Plus de neige - Arrêt des véhicules restants")
+            break
+
         print(f"   🚗 Véhicule Type I #{i+1} en cours...")
         agent, cleared_edges = simulate_vehicle(VehicleTypeI, start_node, config_path, G, f"TypeI_{i+1}")
         all_agents.append(agent)
@@ -217,6 +233,10 @@ def simulate():
 
     # Simuler les véhicules Type II
     for i in range(num_type2):
+        if not has_snow_remaining(G):
+            print(f"   ❄️ Plus de neige - Arrêt des véhicules restants")
+            break
+
         print(f"   🚛 Véhicule Type II #{i+1} en cours...")
         agent, cleared_edges = simulate_vehicle(VehicleTypeII, start_node, config_path, G, f"TypeII_{i+1}")
         all_agents.append(agent)
@@ -226,7 +246,10 @@ def simulate():
 
     # Vérifier s'il reste de la neige
     remaining_snow = estimate_total_snow_edges(G)
-    print(f"\n❄️  Neige restante: {remaining_snow} arêtes")
+    if remaining_snow == 0:
+        print(f"\n🎉 DÉNEIGEMENT TERMINÉ ! Toute la neige a été enlevée.")
+    else:
+        print(f"\n❄️  Neige restante: {remaining_snow} arêtes")
 
     # Calculs des statistiques globales
     total_cost = sum(agent.compute_cost() for agent in all_agents)
@@ -267,6 +290,7 @@ def simulate():
         "strategy": strategy,
         "budget": budget,
         "budget_respected": budget_respected,
+        "snow_clearing_completed": remaining_snow == 0,
         "vehicle_distribution": {
             "type_I": num_type1,
             "type_II": num_type2
@@ -304,7 +328,10 @@ def simulate():
 
     print(f"\n📊 RÉSULTATS GLOBAUX:")
     print(f"🧹 Neige nettoyée: {total_snow_cleared} arêtes")
-    print(f"❄️  Neige restante: {remaining_snow} arêtes")
+    if remaining_snow == 0:
+        print(f"🎉 Neige restante: {remaining_snow} arêtes - DÉNEIGEMENT COMPLET !")
+    else:
+        print(f"❄️  Neige restante: {remaining_snow} arêtes")
     print(f"💸 Coût total: {total_cost:.2f} €")
     print(f"📏 Distance totale: {total_distance:.2f} km")
     print(f"⛽ Carburant total: {total_fuel_used:.2f}")
